@@ -58,7 +58,6 @@
 
     <build>
         <sourceDirectory>src/main/scala</sourceDirectory>
-        <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.scala-tools</groupId>
@@ -72,6 +71,22 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <launchers>
+                        <launcher>
+                        <id>run</id>
+                        <mainClass>SimpleNetflix.PredictionRunner</mainClass>
+                        <jvmArgs>
+                            <jvmArg>-Xmx2g</jvmArg>
+                        </jvmArgs>
+                    </launcher>
+                        <launcher>
+                            <id>stats</id>
+                            <mainClass>SimpleNetflix.PriceDataPreprocessor</mainClass>
+                            <jvmArgs>
+                                <jvmArg>-Xmx2g</jvmArg>
+                            </jvmArgs>
+                        </launcher>
+                    </launchers>
                     <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>
             </plugin>

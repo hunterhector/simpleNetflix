@@ -1,14 +1,13 @@
 package SimpleNetflix
 
-import org.eintr.loglady.Logging
-
 /**
  * Created with IntelliJ IDEA.
- * User: Hector, Zhengzhong Liu
- * Date: 4/3/13
- * Time: 11:12 PM
+ * User: Hector
+ * Date: 4/4/13
+ * Time: 4:07 AM
+ * To change this template use File | Settings | File Templates.
  */
-class MovieBasedPredictor extends Predictor with Logging {
+class NormalizedMovieBasedPredictor extends Predictor{
   /**
    * Given a movie id, an user id, and the Parameter k for KNN
    * Return a list of closest profile wih weight and its prediction
@@ -27,7 +26,7 @@ class MovieBasedPredictor extends Predictor with Logging {
       }
     }.map {
       case (movieId, ratings) =>  //calculate profile similarity for each profile
-        (MathUtils.dotProduct(thisProfile, ratings), movieProfile(movieId)(uid))  //store the pcc distance, and original rating
+        (MathUtils.dotProduct(thisProfile, ratings), movieNormalized(movieId)(uid))  //store the pcc distance, and original rating
     }.toSeq.sortBy(_._1).reverse.take(k).toList  //get the best k
 
     //return result
