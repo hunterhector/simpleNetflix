@@ -75,7 +75,7 @@ object PriceDataPreprocessor extends Logging {
 
     //normalize to PCC
     var moviePccLength = 0.0
-    val movieSelfCentered = movieProfile.map {
+    val movieSelfCentered = centeredMovieProfile.map {
       case (mid, ratings) => {
         var ratingSum = 0.0
         ratings.foreach {
@@ -123,7 +123,7 @@ object PriceDataPreprocessor extends Logging {
 
     //normalize to pcc
     var userPCCLength = 0.0
-    val userSelfCentered = userProfile.map {
+    val userSelfCentered = centeredUserProfile.map {
       case (uid, ratings) => {
         //cal average for each vector
         var ratingSum = 0.0
@@ -166,7 +166,7 @@ object PriceDataPreprocessor extends Logging {
    * @param args
    */
   def main(args: Array[String]) {
-    val (movieProfile, userProfile, moviePcc, userPcc, averageRating) = getRatings()
+    val (movieProfile, userProfile, moviePcc, userPcc,movieSelfCentered,userSelfCentered, averageRating) = ratingData
 
     var aver = 0.0
     var num1Count = 0

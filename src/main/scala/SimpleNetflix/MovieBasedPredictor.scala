@@ -19,9 +19,10 @@ class MovieBasedPredictor extends Predictor with Logging {
    * @return A list of tuple, first element is profile distance, second one is prediction
    */
   def getKNN(mid: Int, uid: Int, k: Int): List[(Double, Double)] = {
-    val thisProfile = moviePcc(mid)   //profile of this movie id
+    val profilesForSimilarity = movieProfile
+    val thisProfile = profilesForSimilarity(mid)   //profile of this movie id
 
-    val knn = moviePcc.filter { //filter out movie profiles that this user didn't rate
+    val knn = profilesForSimilarity.filter { //filter out movie profiles that this user didn't rate
       case (movieId, ratings) => {
         ratings.contains(uid) && movieId != mid
       }

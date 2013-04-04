@@ -18,9 +18,10 @@ class UserBasedPredictor extends Predictor{
    * @return A list of tuple, first element is profile distance, second one is prediction
    */
   protected def getKNN(mid: Int, uid: Int, k: Int): List[(Double, Double)] = {
-    val thisProfile = userPcc(uid)  //profile of this user id
+    val profilesForSimilarity = userProfile
+    val thisProfile = profilesForSimilarity(uid)  //profile of this user id
 
-    val knn = userPcc.filter { //first filter out users that did not rate this
+    val knn = profilesForSimilarity.filter { //first filter out users that did not rate this
       case (userId , ratings) => {
         ratings.contains(mid) && userId != uid
       }
