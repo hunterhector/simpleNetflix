@@ -10,6 +10,11 @@ import org.eintr.loglady.Logging
  * Date: 4/3/13
  * Time: 10:25 PM
  */
+
+
+/**
+ * Like the name, a query reader
+ */
 object QueryReader extends Logging{
 
   log.info("Reading quereis")

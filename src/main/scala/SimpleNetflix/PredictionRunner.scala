@@ -15,10 +15,12 @@ import java.io.{File, FileWriter}
  */
 object PredictionRunner extends Logging {
   def main(args: Array[String]) {
-    val predictorAndOutput: List[(FileWriter, Predictor)] = List(movieMovie(), userUser(),normalized())
-//    val predictorAndOutput: List[(FileWriter, Predictor)] = List(movieMovie(), userUser(), normalized(), custom())
+    // call the four methods to get four different output writer and 4 predictor
+    val predictorAndOutput: List[(FileWriter, Predictor)] = List(userUser(), movieNormalized(), custom())
+    //get the queries
     val queries = QueryReader.queries
 
+    //run experiments and get outputs
     predictorAndOutput.foreach {
       case (output, p) => {
         log.info("Running experiment with %s".format(p.getClass.getName))
@@ -31,10 +33,10 @@ object PredictionRunner extends Logging {
             output.write(mid + ":\n")
             currentMid = mid
           }
-          val pred = p.doQuery(mid, uid, 10)
+          val pred = p.doQuery(mid, uid, 11)
 
           count += 1
-          if (count % 100 == 0)
+          if (count % 1000 == 0)
             log.info("%d queries done.", count)
           output.write(pred + "\n")
         })
@@ -47,7 +49,7 @@ object PredictionRunner extends Logging {
     val outputFile = new File(DocumentPaths.userBasedOutput)
     outputFile.createNewFile()
     val output = new FileWriter(outputFile)
-    val p = new UserBasedPredictor
+    val p = new UserBasedKnnPredictor
 
     (output, p)
   }
@@ -56,21 +58,35 @@ object PredictionRunner extends Logging {
     val outputFile = new File(DocumentPaths.movieBasedOutput)
     outputFile.createNewFile()
     val output = new FileWriter(outputFile)
-    val p = new MovieBasedPredictor
+    val p = new MovieBasedKnnPredictor
 
     (output,p)
   }
 
-  def normalized() = {
-    val outputFile = new File(DocumentPaths.normalizedOutput)
+  def movieNormalized() = {
+    val outputFile = new File(DocumentPaths.movieNormalizedOutput)
     outputFile.createNewFile()
     val output = new FileWriter(outputFile)
-    val p = new NormalizedMovieBasedPredictor
+    val p = new NormalizedMovieBasedKnnPredictor
+
+    (output,p)
+  }
+
+  def userNormalized() = {
+    val outputFile = new File(DocumentPaths.userNormalizedOutput)
+    outputFile.createNewFile()
+    val output = new FileWriter(outputFile)
+    val p = new NormalizedUserBasedKnnPredictor
 
     (output,p)
   }
 
   def custom() = {
+    val outputFile = new File(DocumentPaths.customOutput)
+    outputFile.createNewFile()
+    val output = new FileWriter(outputFile)
+    val p = new CustomPredictor
 
+    (output,p)
   }
 }

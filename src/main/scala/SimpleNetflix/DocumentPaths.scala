@@ -12,11 +12,12 @@ package SimpleNetflix
  */
 object DocumentPaths {
   private val basePath = "data/download_sample/"
-  val queries = basePath + "queries-small.txt"
+  val queries = basePath + "queries.txt"
   val titles = basePath + "movie_titles.txt"
   val data = basePath + "training_set"
-  val movieBasedOutput = "data/sample_output/movieBased.txt"
-  val userBasedOutput = "data/sample_output/userBased.txt"
-  val normalizedOutput = "data/sample_output/normalized.txt"
-  val customOutput = "data/sample_output/custom.txt"
+  val movieBasedOutput = "data/output/movieBased.txt"
+  val userBasedOutput = "data/output/userBased.txt"
+  val movieNormalizedOutput = "data/output/normalized_movie.txt"
+  val userNormalizedOutput = "data/output/normalized_user.txt"
+  val customOutput = "data/output/custom.txt"
 }

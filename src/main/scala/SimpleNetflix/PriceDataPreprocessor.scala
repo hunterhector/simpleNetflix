@@ -27,7 +27,7 @@ object PriceDataPreprocessor extends Logging {
     log.info("Reading dataset...")
     val userProfile = mutable.Map.empty[Int, Map[Int, Double]]
 
-    //build movie profile from file, user profile is built at the same ime
+    //build movie profile from file, user profile is built at the same time
     val movieProfile = dataFolder.listFiles().map(file => {
       val lines = Source.fromFile(file).getLines().toList
       val mid = lines(0).trim.stripSuffix(":").toInt
@@ -47,65 +47,53 @@ object PriceDataPreprocessor extends Logging {
     }).toMap
 
     //calculate the average of all ratings
-    var aver = 0.0
+    var globalAverage = 0.0
     var totalRatings = 0
     movieProfile.foreach {
       case (mid, ratings) => {
         ratings.foreach {
           case (uid, rating) => {
-            aver += rating
+            globalAverage += rating
             totalRatings += 1
           }
         }
       }
     }
-    aver = aver / totalRatings
+    globalAverage = globalAverage / totalRatings
 
     //minus each rating by the average
     val centeredMovieProfile = movieProfile.map {
       case (mid, ratings) => {
         val centeredRatings = ratings.map {
           case (uid, rate) => {
-            (uid, rate - aver)
+            (uid, rate - globalAverage)
           }
         }
         (mid, centeredRatings)
       }
     }
 
-    //normalize to PCC
-    var moviePccLength = 0.0
-    val movieSelfCentered = centeredMovieProfile.map {
-      case (mid, ratings) => {
-        var ratingSum = 0.0
-        ratings.foreach {
-          case (uid, rate) => {
-            ratingSum += rate
+    //store the cosine length
+    val centeredMovieProfileNorm = centeredMovieProfile.map{
+      case (mid, ratings)=>{
+        val norm = ratings.map{
+          case (uid, rate) =>{
+            rate*rate
           }
-        }
-        //cal average for each vector
-        val ratingAver = ratingSum / ratings.size
-        val pccRatings = ratings.map {
-          case (uid, rate) => {
-            //center average on itself
-            val selfCenter = rate - ratingAver
-            moviePccLength += selfCenter * selfCenter
-            (uid, selfCenter)
-          }
-        }
-        (mid, pccRatings)
+        }.sum
+        (mid,norm)
       }
     }
 
-    //normalized by centered length
-    val moviePcc = movieSelfCentered.map {
-      case (mid, ratings) => {
-        val pccRatings = ratings.map {
-          case (uid, rate) => {
-            (uid, rate / math.sqrt(moviePccLength))
+    //movie rating averages
+    val movieAverage = centeredMovieProfile.map {
+      case (mid,ratings) =>{
+        val aver = ratings.map {
+          case (uid, rate) =>{
+            rate
           }
-        }
-        (mid, pccRatings)
+        }.sum/ratings.size
+        (mid,aver)
       }
     }
 
@@ -114,51 +102,40 @@ object PriceDataPreprocessor extends Logging {
       case (uid, ratings) => {
         val centeredRatings = ratings.map {
           case (mid, rate) => {
-            (mid, rate - aver)
+            (mid, rate - globalAverage)
           }
         }
         (uid, centeredRatings)
       }
     }.toMap
 
-    //normalize to pcc
-    var userPCCLength = 0.0
-    val userSelfCentered = centeredUserProfile.map {
-      case (uid, ratings) => {
-        //cal average for each vector
-        var ratingSum = 0.0
-        ratings.foreach {
-          case (mid, rate) => {
-            ratingSum += rate
+    //get user averages
+    val userAverage = centeredUserProfile.map {
+      case (uid,ratings) =>{
+        val aver = ratings.map {
+          case (mid, rate) =>{
+            rate
           }
-        }
-        val ratingAver = ratingSum / ratings.size
-        //center by self average
-        val pccRatings = ratings.map {
-          case (mid, rate) => {
-            val selfCenter = rate - ratingAver
-            userPCCLength += selfCenter * selfCenter
-            (mid, selfCenter)
-          }
-        }
-        (uid, pccRatings)
+        }.sum/ratings.size
+        (uid,aver)
       }
     }
 
-    //normalized by centered length
-    val userPcc = userSelfCentered.map {
-      case (uid, ratings) => {
-        val pccRatings = ratings.map {
-          case (mid, rate) => {
-            (mid, rate /math.sqrt(userPCCLength))
+    //the L2 Norm for the centered user profile
+    val centeredUserProfileNorm = centeredUserProfile.map {
+      case (uid, ratings) =>{
+        val norm = ratings.map {
+          case (uid, rate) => {
+            rate*rate
           }
-        }
-        (uid, pccRatings)
+        }.sum
+        (uid,norm)
       }
     }
+
 
     log.info("Done.")
-    (centeredMovieProfile, centeredUserProfile, moviePcc, userPcc,movieSelfCentered,userSelfCentered, aver)
+    (centeredMovieProfile, centeredUserProfile,centeredMovieProfileNorm,centeredUserProfileNorm, movieAverage,userAverage,globalAverage)
   }
 
   /**
@@ -166,7 +143,7 @@ object PriceDataPreprocessor extends Logging {
    * @param args
    */
   def main(args: Array[String]) {
-    val (movieProfile, userProfile, moviePcc, userPcc,movieSelfCentered,userSelfCentered, averageRating) = ratingData
+    val (movieProfile, userProfile, centeredMovieProfileNorm,centeredUserProfileNorm,movieAverage,userAverage, averageRating) = ratingData
 
     var aver = 0.0
     var num1Count = 0

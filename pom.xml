@@ -76,7 +76,7 @@
                         <id>run</id>
                         <mainClass>SimpleNetflix.PredictionRunner</mainClass>
                         <jvmArgs>
-                            <jvmArg>-Xmx2g</jvmArg>
+                            <jvmArg>-Xmx5g</jvmArg>
                         </jvmArgs>
                     </launcher>
                         <launcher>
